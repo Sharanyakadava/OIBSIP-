@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}History — {{ user_name }}{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('index') }}" class="back-link">&larr; Back to calculator</a>
+
+<section class="card">
+    <h1>BMI history — {{ user_name }}</h1>
+
+    {% if records %}
+        <img class="trend-chart" src="{{ url_for('graph', user_name=user_name) }}" alt="BMI trend chart for {{ user_name }}">
+
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Weight (kg)</th>
+                    <th>Height (m)</th>
+                    <th>BMI</th>
+                    <th>Category</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td>{{ r.recorded_at }}</td>
+                    <td>{{ r.weight_kg }}</td>
+                    <td>{{ r.height_m }}</td>
+                    <td>{{ "%.2f"|format(r.bmi) }}</td>
+                    <td>{{ r.category }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete', record_id=r.id, user_name=user_name) }}"
+                              onsubmit="return confirm('Delete this record?');">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No records to show for this user yet.</p>
+    {% endif %}
+</section>
+{% endblock %}
