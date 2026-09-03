@@ -1,11 +1,5 @@
 # BMI Calculator
 
-A BMI calculator with two run modes:
-
-- **Beginner tier (CLI):** `cli.py` — plain command-line input/validation/output.
-- **Advanced tier (GUI):** `app.py` — a Flask web app used *instead of tkinter* as the
-  GUI layer, with multi-user SQLite storage and a matplotlib BMI trend chart.
-
 ## Setup
 
 ```bash
