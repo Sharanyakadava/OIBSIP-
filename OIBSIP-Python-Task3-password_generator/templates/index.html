@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Password Generator{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h1>Generate a password</h1>
+    <form method="POST" action="{{ url_for('index') }}" class="pw-form">
+
+        <label for="length">Length: <span id="length_value">{{ form_values.length }}</span></label>
+        <input type="range" id="length" name="length" min="{{ min_length }}" max="64"
+               value="{{ form_values.length }}"
+               oninput="document.getElementById('length_value').textContent = this.value;">
+
+        <fieldset class="types">
+            <legend>Character types (select at least 2)</legend>
+            {% for t in char_pools %}
+            <label class="checkbox-label">
+                <input type="checkbox" name="types" value="{{ t }}"
+                       {% if t in form_values.selected_types %}checked{% endif %}>
+                {{ type_labels[t] }}
+            </label>
+            {% endfor %}
+        </fieldset>
+
+        <label class="checkbox-label">
+            <input type="checkbox" name="exclude_ambiguous"
+                   {% if form_values.exclude_ambiguous %}checked{% endif %}>
+            Exclude ambiguous characters (0, O, l, 1, I, etc.)
+        </label>
+
+        <button type="submit" class="btn-primary">Generate</button>
+    </form>
+
+    {% if result %}
+    <div class="result-box">
+        <div class="password-row">
+            <code id="generated-password" class="password-text">{{ result.password }}</code>
+            <button type="button" class="btn-copy" onclick="copyPassword()">Copy</button>
+        </div>
+        <span id="copy-feedback" class="copy-feedback"></span>
+
+        <div class="strength-wrap">
+            <div class="strength-label strength-{{ result.strength_label|lower }}">
+                {{ result.strength_label }}
+            </div>
+            <div class="strength-bar-bg">
+                <div class="strength-bar-fill strength-{{ result.strength_label|lower }}"
+                     style="width: {{ result.strength_score }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-copy on generation, using the browser Clipboard API.
+        // (This is the web-native equivalent of pyperclip: pyperclip would
+        // copy to the clipboard of the machine running the Flask server,
+        // not the user's browser, so the Clipboard API is used instead.)
+        window.addEventListener("DOMContentLoaded", function () {
+            copyPassword(true);
+        });
+
+        function copyPassword(silent) {
+            const text = document.getElementById("generated-password").textContent;
+            navigator.clipboard.writeText(text).then(function () {
+                const el = document.getElementById("copy-feedback");
+                el.textContent = "Copied to clipboard!";
+                setTimeout(() => { el.textContent = ""; }, 2000);
+            }).catch(function () {
+                if (!silent) {
+                    document.getElementById("copy-feedback").textContent =
+                        "Could not access clipboard — copy manually.";
+                }
+            });
+        }
+    </script>
+    {% endif %}
+</section>
+
+{% if history %}
+<section class="card">
+    <div class="history-header">
+        <h2>History (this session, last {{ history|length }})</h2>
+        <form method="POST" action="{{ url_for('clear_history') }}">
+            <button type="submit" class="btn-secondary">Clear</button>
+        </form>
+    </div>
+    <ul class="history-list">
+        {% for item in history %}
+        <li>
+            <code>{{ item.password }}</code>
+            <span class="tag tag-{{ item.strength_label|lower }}">{{ item.strength_label }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+{% endblock %}
