@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}#{{ room_name }} - Chat{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('rooms') }}" class="back-link">&larr; All rooms</a>
+
+<section class="card chat-card">
+    <h1># {{ room_name }}</h1>
+
+    <div id="messages" class="messages-pane"></div>
+
+    <form id="message-form" class="message-form">
+        <input type="text" id="message-input" placeholder="Type a message... (try :smile: or :fire:)" autocomplete="off">
+        <button type="submit" class="btn-primary">Send</button>
+    </form>
+    <p class="hint">Emoji shortcodes like <code>:smile:</code>, <code>:fire:</code>, <code>:tada:</code> are rendered automatically.</p>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+    const ROOM_NAME = {{ room_name|tojson }};
+    const USERNAME = {{ username|tojson }};
+</script>
+<script src="{{ url_for('static', filename='chat.js') }}"></script>
+{% endblock %}

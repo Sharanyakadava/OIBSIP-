@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Rooms{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h1>Chat rooms</h1>
+
+    {% if db_error %}
+        <p class="flash flash-error">Could not load rooms: {{ db_error }}</p>
+    {% elif rooms %}
+        <ul class="room-list">
+            {% for room in rooms %}
+            <li>
+                <a href="{{ url_for('chat', room_name=room.name) }}" class="room-link">
+                    # {{ room.name }}
+                </a>
+                <span class="room-meta">created by {{ room.created_by }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No rooms yet — create the first one below.</p>
+    {% endif %}
+</section>
+
+<section class="card">
+    <h2>Create a new room</h2>
+    <form method="POST" class="room-form">
+        <input type="text" name="room_name" placeholder="e.g. random" required>
+        <button type="submit" class="btn-primary">Create &amp; join</button>
+    </form>
+</section>
+{% endblock %}
